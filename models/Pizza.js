@@ -1,4 +1,5 @@
 const {Schema, model} = require('mongoose');
+const dateFormat = require('../utils/dateFormat')
 
 const pizzaSchema = new Schema({
     pizzaName : {
@@ -9,13 +10,44 @@ const pizzaSchema = new Schema({
     },
     createdAt:{
         type: Date,
-        default: Date.now
+        default: Date.now,
+        get: function(createdAtVal){
+            return dateFormat(createdAtVal)
+        }
     },
     size:{
         type : String,
         default: 'Large'
     },
-    toppings: []
+    toppings: [],
+    comments :[
+        {
+            type : Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ]
+},
+    //To add configuration
+{
+    // To allow use of virtuals 
+    toJSON:{
+      virtuals: true,
+      getters: true
+    },
+    //since we don't need ids for the virtuals
+    id : false   
+}
+);
+
+
+/**
+ * Expect: { commentCount : `Length of comments array`}
+ * 
+ */
+pizzaSchema
+.virtual('commentCount')
+.get(function(){
+    return this.comments.length;
 })
 
 // create pizza model using the PizzaSchema

@@ -4,8 +4,15 @@ const pizzaController ={
     // Get all Pizzas
     async getAllPizzas(req,res){
         try{
-            const pizza = await Pizza.find({})
-
+            const pizza = await Pizza
+                                    .find({}) 
+                                    .populate({
+                                        path: 'comments',
+                                        select: '-__v',
+                                        options: { sort: { createdAt: -1 }}
+                                    })
+                                    .select('-__v')
+                                    .sort({_id : -1});
             if(!pizza.length){
                 return res
                 .status(404)
@@ -24,8 +31,14 @@ const pizzaController ={
     // To get a single pizza by it's ID
     async getPizzaById({params},res){
         try{
-            const pizza = await Pizza.findOne({_id: params.id})
-
+            const pizza = await Pizza
+                                .findOne({_id: params.id})
+                                .populate({
+                                    path: 'comments',
+                                    select: '-__v',
+                                    options: { sort: { createdAt: -1 }}
+                                })
+                                .select('-__v');
             if(!pizza){
                 return res
                 .status(404)
