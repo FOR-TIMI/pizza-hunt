@@ -67,7 +67,7 @@ const pizzaController ={
     //To update a single pizza
     async updatePizza({params,body}, res){
         try{
-        const pizza = await Pizza.findOneAndUpdate({_id : params.id}, body, {new: true})
+        const pizza = await Pizza.findOneAndUpdate({_id : params.id}, body, {new: true, runValidators:true})
 
         if(!pizza){
             return res

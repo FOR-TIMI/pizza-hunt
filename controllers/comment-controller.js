@@ -68,12 +68,12 @@ const commentController = {
         const reply = await Comment.findOneAndUpdate(
             { _id : params.commentId},
             {$push: {replies: body}},
-            {new: true}
+            {new: true, runValidators: true}
         )
 
         if(!reply){
             return res
-                   .status
+                   .status(404)
                    .json({message: `No pizza found with this id`})
         }
 
