@@ -1,8 +1,13 @@
 const $pizzaList = document.querySelector('#pizza-list');
 
 async function getPizzaList(){
-     let pizzas = await fetch('/api/pizza')
-     pizzas = await pizzas.json();
+     const response = await fetch('/api/pizza')
+
+     if(!response.ok){
+      const message = `An error has occured: ${response.status}`
+      throw new Error(message)
+     }
+     const pizzas = await response.json();
 
      pizzas.forEach(printPizza)
 }

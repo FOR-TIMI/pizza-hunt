@@ -9,8 +9,34 @@ const $newCommentForm = document.querySelector('#new-comment-form');
 
 let pizzaId;
 
+async function getPizza(){
+
+try{
+    // To get id of pizza '?:id'
+    const searchParams = new URLSearchParams(document.location.search.substring(1));
+    const pizzaId = searchParams.get("id");
+  
+    // Get pizza Info for that id
+     const response = await fetch(`/api/pizza/${pizzaId}`)
+  
+     if(!response.ok){
+       const message = `An error has occured: ${response.status}`
+       throw new Error(message)
+     }
+  
+     const pizza = await response.json();
+     printPizza(pizza)
+}
+catch(err){
+  console.log(err);
+  alert('Cannot find a pizza with this id! Taking you back.');
+  window.history.back();
+};
+
+}
+
+
 function printPizza(pizzaData) {
-  console.log(pizzaData);
 
   pizzaId = pizzaData._id;
 
@@ -76,8 +102,12 @@ function printReply(reply) {
 `;
 }
 
-function handleNewCommentSubmit(event) {
+async function handleNewCommentSubmit(event) {
   event.preventDefault();
+
+      // To get id of pizza '?:id'
+  const searchParams = new URLSearchParams(document.location.search.substring(1));
+  const pizzaId = searchParams.get("id");  
 
   const commentBody = $newCommentForm.querySelector('#comment').value;
   const writtenBy = $newCommentForm.querySelector('#written-by').value;
@@ -87,9 +117,34 @@ function handleNewCommentSubmit(event) {
   }
 
   const formData = { commentBody, writtenBy };
+
+try{
+    const response = await fetch(`/api/comments/${pizzaId}`,{
+      method : `POST`,  
+      headers: {
+      Accept : 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+
+    if (!response.ok) {
+      throw new Error('Something went wrong!');
+    }
+
+    const newComment = await response.json();
+
+
+    location.reload()
+    return;
+}
+catch(err){
+  console.log(err)
 }
 
-function handleNewReplySubmit(event) {
+}
+
+async function handleNewReplySubmit(event) {
   event.preventDefault();
 
   if (!event.target.matches('.reply-form')) {
@@ -104,8 +159,31 @@ function handleNewReplySubmit(event) {
   if (!replyBody || !writtenBy) {
     return false;
   }
-
   const formData = { writtenBy, replyBody };
+  console.log(formData)
+  try{
+      const response = await fetch(`/api/comments/${pizzaId}/${commentId}`,{
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+
+        if (!response.ok) {
+          throw new Error('Something went wrong!');
+        }
+
+      const reply = await response.json()
+      console.log(reply)
+      location.reload();
+  }
+  catch(err){
+    console.log(err);
+    alert('Cannot find a pizza with this id! Taking you back.');
+    window.history.back();
+  }
 }
 
 $backBtn.addEventListener('click', function() {
@@ -114,3 +192,5 @@ $backBtn.addEventListener('click', function() {
 
 $newCommentForm.addEventListener('submit', handleNewCommentSubmit);
 $commentSection.addEventListener('submit', handleNewReplySubmit);
+
+getPizza();

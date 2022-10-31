@@ -60,6 +60,51 @@ const commentController = {
         catch(err){
             res.status(500).json(err)
         }
+    },
+
+    //add Reply
+    async addReply({params, body},res){
+      try{
+        const reply = await Comment.findOneAndUpdate(
+            { _id : params.commentId},
+            {$push: {replies: body}},
+            {new: true}
+        )
+
+        if(!reply){
+            return res
+                   .status
+                   .json({message: `No pizza found with this id`})
+        }
+
+        res.json(reply)
+        return;
+      }
+      catch(err){
+        res.status(500).json(err)
+      }
+    },
+
+    //remove Reply
+    async removeReply({params},res){
+        try{
+            const comment = await Comment.findByIdAndUpdate(
+                {_id: params.commentId},
+                {$pull: {replies: { replyId: params.replyId}}},
+                {new: true}
+            )
+            if(!comment){
+                return res
+                    .status(500)
+                    .json({message: `Couldn't find that comment`})
+            }
+
+            res.json(comment)
+            return;
+        }
+        catch(err){
+            res.status(500).json(err)
+        }
     }
 }
 

@@ -53,7 +53,7 @@ const handlePizzaSubmit = async event => {
   const formData = { pizzaName, createdBy, size, toppings };
 
 try{
-  const createPizza = await fetch('/api/pizza',{
+  const res = await fetch('/api/pizza',{
     method: 'POST',
     headers: {
       Accept : 'application/json',
@@ -61,11 +61,15 @@ try{
     },
     body: JSON.stringify(formData)
   })
+  
+  if (!res.ok) {
+    throw new Error('Something went wrong!');
+  }
 
-  const res = await createPizza.json()
+  const pizza = await res.json()
 
   alert('Pizza created successful')
-  console.log(res)
+  console.log(pizza)
 }
 catch(err){
   console.log(err)
