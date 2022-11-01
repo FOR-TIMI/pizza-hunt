@@ -33,7 +33,7 @@ const commentController = {
     },
 
   //remove comment
-  async removeComment({params,res}){
+  async removeComment({params},res){
          try{
             const deletedComment = await Comment.findOneAndDelete({ _id: params.commentId })
             if(!deletedComment){
